@@ -85,7 +85,7 @@ class DeepAutoencoder(Network):
         net.biases[1] = self.biases[-j-1]
         net.weights[0] = self.weights[j]
         net.weights[1] = self.weights[-j-1]
-        net.SGD(encoded_training_data, epochs, mini_batch_size, eta, lmbda)
+        net.sgd(encoded_training_data, epochs, mini_batch_size, eta, lmbda)
         self.biases[j] = net.biases[0]
         self.biases[-j-1] = net.biases[1]
         self.weights[j] = net.weights[0]

@@ -33,7 +33,7 @@ def train_autoencoder(hidden_units, training_data):
     "Return a trained autoencoder."
     autoencoder_training_data = [(x, x) for x, _ in training_data]
     net = Network([784, hidden_units, 784])
-    net.SGD(autoencoder_training_data, 6, 10, 0.01, 0.05)
+    net.sgd(autoencoder_training_data, 6, 10, 0.01, 0.05)
     return net
 
 def plot_test_results(net, test_inputs):
@@ -72,12 +72,12 @@ def classifier(hidden_units, n_unlabeled_inputs, n_labeled_inputs):
     net_c.biases = net_ae.biases[:1]+[np.random.randn(10, 1)/np.sqrt(10)]
     net_c.weights = net_ae.weights[:1]+\
         [np.random.randn(10, hidden_units)/np.sqrt(10)]
-    net_c.SGD(training_data[-n_labeled_inputs:], 300, 10, 0.01, 0.05)
+    net_c.sgd(training_data[-n_labeled_inputs:], 300, 10, 0.01, 0.05)
     print "Result on test data: %s / %s" % (
         net_c.evaluate(test_inputs, actual_test_results), len(test_inputs))
     print "Training a network with %s items of training data" % n_labeled_inputs
     net = Network([784, hidden_units, 10])
-    net.SGD(training_data[-n_labeled_inputs:], 300, 10, 0.01, 0.05)
+    net.sgd(training_data[-n_labeled_inputs:], 300, 10, 0.01, 0.05)
     print "Result on test data: %s / %s" % (
         net.evaluate(test_inputs, actual_test_results), len(test_inputs))
     return net_c

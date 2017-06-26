@@ -32,7 +32,7 @@ def add_classifier_layer(net, num_outputs):
 def SGD_final_layer(
     self, training_data, epochs, mini_batch_size, eta, lmbda):
     """
-    Run SGD on the final layer of the Network ``self``.  Note that
+    Run sgd on the final layer of the Network ``self``.  Note that
     ``training_data`` is the input to the whole Network, not the
     encoded training data input to the final layer. 
     """
@@ -42,7 +42,7 @@ def SGD_final_layer(
     net = Network(self.sizes[-2:])
     net.biases[0] = self.biases[-1]
     net.weights[0] = self.weights[-1]
-    net.SGD(encoded_training_data, epochs, mini_batch_size, eta, lmbda)
+    net.sgd(encoded_training_data, epochs, mini_batch_size, eta, lmbda)
     self.biases[-1] = net.biases[0]
     self.weights[-1] = net.weights[0]
 

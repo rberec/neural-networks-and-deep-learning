@@ -34,11 +34,11 @@ test = [x for x, _ in training_data[37500:37500+SIZE]]
 
 print "\nFinding first autoencoder"
 ae_1 = Network([784, HIDDEN, 784])
-ae_1.SGD(td_1, 4, 10, 0.01, 0.05)
+ae_1.sgd(td_1, 4, 10, 0.01, 0.05)
 
 print "\nFinding second autoencoder"
 ae_2 = Network([784, HIDDEN, 784])
-ae_2.SGD(td_1, 4, 10, 0.01, 0.05)
+ae_2.sgd(td_1, 4, 10, 0.01, 0.05)
 
 print "\nGenerating encoded training data"
 encoded_td_1 = [sigmoid_vec(np.dot(ae_1.weights[0], x)+ae_1.biases[0])
@@ -49,7 +49,7 @@ encoded_training_data = zip(encoded_td_1, encoded_td_2)
 
 print "\nFinding mapping between theories"
 net = Network([HIDDEN, HIDDEN])
-net.SGD(encoded_training_data, 6, 10, 0.01, 0.05)
+net.sgd(encoded_training_data, 6, 10, 0.01, 0.05)
 
 print """\nBaseline for comparison: decompress with the first autoencoder"""
 print """and compress with the second autoencoder"""
