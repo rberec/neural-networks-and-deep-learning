@@ -9,7 +9,7 @@ simple, easily readable, and easily modifiable.  It is not optimized,
 and omits many desirable features.
 """
 
-#### Libraries
+# Libraries
 # Standard library
 import random
 
@@ -78,8 +78,8 @@ class Network(object):
         The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
         is the learning rate."""
         
-        x = np.column_stack(np.array(mini_batch)[:,0])
-        y = np.column_stack(np.array(mini_batch)[:,1])        
+        x = np.column_stack(np.array(mini_batch)[:, 0])
+        y = np.column_stack(np.array(mini_batch)[:, 1])
 
         nabla_b, nabla_w = self.backprop(x, y)
             
@@ -105,9 +105,9 @@ class Network(object):
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
-        nabla_b[-1] = np.dot(delta, np.ones((delta.shape[1],1)))
+        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
+
+        nabla_b[-1] = np.dot(delta, np.ones((delta.shape[1], 1)))
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
         # Note that the variable l in the loop below is used a little
         # differently to the notation in Chapter 2 of the book.  Here,
@@ -119,7 +119,7 @@ class Network(object):
             z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
-            nabla_b[-l] = np.dot(delta, np.ones((delta.shape[1],1)))
+            nabla_b[-l] = np.dot(delta, np.ones((delta.shape[1], 1)))
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
@@ -137,10 +137,12 @@ class Network(object):
         \partial a for the output activations."""
         return (output_activations-y)
 
-#### Miscellaneous functions
+
+# Miscellaneous functions
 def sigmoid(z):
     """The sigmoid function."""
     return 1.0/(1.0+np.exp(-z))
+
 
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
