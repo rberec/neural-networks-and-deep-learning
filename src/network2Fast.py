@@ -16,6 +16,7 @@ features.
 import json
 import random
 import sys
+import copy
 
 # Third-party libraries
 import numpy as np
@@ -126,7 +127,7 @@ class Network(object):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-    def sgd(self, training_data, epochs, mini_batch_size, eta,
+    def sgd(self, training_data_, epochs, mini_batch_size, eta,
             lmbda = 0.0,
             evaluation_data=None,
             monitor_evaluation_cost=False,
@@ -153,10 +154,9 @@ class Network(object):
 
         """
         random.seed(42)
-        training_data = list(training_data)
+        training_data = copy.deepcopy(training_data_)
 
         if evaluation_data:
-            evaluation_data = list(evaluation_data)
             n_data = len(evaluation_data)
 
         n = len(training_data)

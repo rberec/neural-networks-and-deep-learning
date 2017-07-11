@@ -12,6 +12,7 @@ and omits many desirable features.
 # Libraries
 # Standard library
 import random
+import copy
 
 # Third-party libraries
 import numpy as np
@@ -41,7 +42,7 @@ class Network(object):
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-    def sgd(self, training_data, epochs, mini_batch_size, eta,
+    def sgd(self, training_data_, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
@@ -52,10 +53,9 @@ class Network(object):
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
         random.seed(42)
-        training_data = list(training_data)
+        training_data = copy.deepcopy(training_data_)
 
         if test_data:
-            test_data = list(test_data)
             n_test = len(test_data)
 
         n = len(training_data)
