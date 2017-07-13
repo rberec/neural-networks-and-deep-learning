@@ -7,9 +7,9 @@ Additions so far are:
 
 - code works with Python 3
 - added fast versions of network and network2
-- added first version of network4 which is a re-write of network3 but in Tensorflow
+- added ~~first version of~~ network4 which is a re-write of network3 but in Tensorflow
 
 What is missing:
 
-- finish convolutional layer port to Tensorflow
-- investigate why l2 regularization does not work properly in network4
+- ~~finish convolutional layer port to Tensorflow~~ Done.
+- ~~investigate why l2 regularization does not work properly in network4~~ Done: I was using too high lambda parameter. Setting it to 0.1 solved the issue.

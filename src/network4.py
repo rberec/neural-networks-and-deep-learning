@@ -63,7 +63,6 @@ class Network(object):
         self.layers = layers
         self.mini_batch_size = mini_batch_size
         self.params = [param for layer in self.layers for param in layer.params]
-        # self.x = tf.placeholder(tf.float32, shape=(None, 28, 28), name="X")
         self.x = tf.placeholder(tf.float32, shape=(None, 784), name="X")
         self.y = tf.placeholder(tf.int64, shape=None, name="y")
         init_layer = self.layers[0]
@@ -91,12 +90,13 @@ class Network(object):
         l2_norm_squared = tf.reduce_sum([tf.nn.l2_loss(layer.w) for layer in self.layers])
         cost = self.layers[-1].cost(self) + lmbda * l2_norm_squared / num_training_batches
         grads = tf.gradients(cost, self.params)
-        updates = [tf.assign(param, param - eta * grad) for param, grad in zip(self.params, grads)]
-
-        validate_mb_accuracy = self.layers[-1].accuracy(self.y)
 
         # define functions to train a mini-batch, and to compute the
         # accuracy in validation and test mini-batches.
+
+        updates = [tf.assign(param, param - eta * grad) for param, grad in zip(self.params, grads)]
+
+        validate_mb_accuracy = self.layers[-1].accuracy(self.y)
 
         sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -106,8 +106,6 @@ class Network(object):
         for epoch in range(epochs):
             for minibatch_index in range(num_training_batches):
                 iteration = num_training_batches * epoch + minibatch_index
-                if iteration % 1000 == 0:
-                    print("Training mini-batch number {0}".format(iteration))
 
                 sess.run(updates, feed_dict={self.x: training_x[minibatch_index * self.mini_batch_size: (minibatch_index + 1) * self.mini_batch_size],
                                              self.y: training_y[minibatch_index * self.mini_batch_size: (minibatch_index + 1) * self.mini_batch_size]})
@@ -125,10 +123,19 @@ class Network(object):
                         print("This is the best validation accuracy to date.")
                         best_validation_accuracy = validation_accuracy
                         best_iteration = iteration
+                        if test_data:
+                            test_accuracy = np.mean(
+                                [sess.run(validate_mb_accuracy, feed_dict={
+                                    self.x: test_x[j * self.mini_batch_size: (j + 1) * self.mini_batch_size],
+                                    self.y: test_y[j * self.mini_batch_size: (j + 1) * self.mini_batch_size]})
+                                 for j in range(num_test_batches)])
+                            print('The corresponding test accuracy is {0:.2%}'.format(
+                                test_accuracy))
 
         print("Finished training network.")
         print("Best validation accuracy of {0:.2%} obtained at iteration {1}".format(
            best_validation_accuracy, best_iteration))
+        print("Corresponding test accuracy of {0:.2%}".format(test_accuracy))
 
 
 # Define layer types
@@ -162,22 +169,22 @@ class ConvPoolLayer(object):
         n_out = (filter_shape[0] * np.prod(filter_shape[2:]) / np.prod(poolsize))
         self.w = tf.Variable(
             np.asarray(
-                np.random.normal(loc=0, scale=np.sqrt(1.0 / n_out), size=filter_shape),
-                dtype=tf.float32))
+                np.random.normal(loc=0, scale=np.sqrt(1.0 / n_out), size=filter_shape)),
+            dtype=tf.float32)
         self.b = tf.Variable(
             np.asarray(
-                np.random.normal(loc=0, scale=1.0, size=(filter_shape[0],)),
-                dtype=tf.float32))
+                np.random.normal(loc=0, scale=1.0, size=(filter_shape[3],))),
+            dtype=tf.float32)
         self.params = [self.w, self.b]
 
     def set_inpt(self, inpt, inpt_dropout, mini_batch_size):
-        self.inpt = inpt.reshape(self.image_shape)
-        conv_out = convolutional.conv2d(
-            inputs=self.inpt, filters=self.w, kernel_size=self.filter_shape)
-        pooled_out = pooling.max_pooling2d(
-            inputs=conv_out, pool_size=self.poolsize)
+        self.inpt = tf.reshape(inpt, self.image_shape)
+        conv_out = tf.nn.conv2d(
+            input=self.inpt, filter=self.w, strides=[1, 1, 1, 1], padding="VALID")
+        pooled_out = tf.nn.max_pool(
+            value=conv_out, ksize=self.poolsize, strides=self.poolsize, padding="VALID")
         self.output = self.activation_fn(
-            pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
+            pooled_out + self.b)
         self.output_dropout = self.output  # no dropout in the convolutional layers
 
 
@@ -212,7 +219,7 @@ class FullyConnectedLayer(object):
 
     def accuracy(self, y):
         "Return the accuracy for the mini-batch."
-        return T.mean(T.eq(y, self.y_out))
+        tf.reduce_mean(tf.cast(tf.equal(y, self.y_out), tf.float32))
 
 
 class SoftmaxLayer(object):
